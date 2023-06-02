@@ -9,6 +9,7 @@ for (let i = 0; i < 64; i++) {
   for (let j = 0; j < 64; j++) {
     const cell = document.createElement('div');
     cell.classList.add('grid-cell');
+    cell.dataset.number = i * 64 + j + 1; // Assign a number to the cell using data attribute
 
     // Add event listeners for mouse events
     cell.addEventListener('mousedown', () => {
@@ -29,6 +30,12 @@ for (let i = 0; i < 64; i++) {
     gridContainer.appendChild(cell);
   }
 }
+
+ function updateColor() {
+      const colorPicker = document.getElementById('color-picker');
+      const newColor = colorPicker.value;
+      updateSelectedColor(newColor);
+ }
 
 // Function to update the selected color or toggle eraser state
 function updateSelectedColor(color) {
@@ -150,4 +157,100 @@ function downloadGrid() {
   link.href = canvas.toDataURL('image/png');
   link.download = 'grid.png';
   link.click();
+}
+
+function downloadGridJSON() {
+  let gridData = [];
+
+  for (let i = 0; i < 64; i++) {
+    for (let j = 0; j < 64; j++) {
+      const cell = document.querySelector(`.grid-cell[data-number="${i * 64 + j + 1}"]`);
+      const cellColor = cell.style.backgroundColor || 'transparent';
+
+      gridData.push({ number: i * 64 + j + 1, color: cellColor });
+    }
+  }
+
+  const jsonData = JSON.stringify(gridData, null, 2);
+
+  const link = document.createElement('a');
+  const blob = new Blob([jsonData], { type: 'application/json' });
+  link.href = URL.createObjectURL(blob);
+  link.download = 'grid_data.json';
+  link.click();
+}
+
+// // Function to read and apply the grid data from a JSON file
+// function uploadJSONGrid() {
+//   const fileInput = document.getElementById('json-file-input');
+//   const file = fileInput.files[0];
+
+//   const reader = new FileReader();
+//   reader.onload = function (e) {
+//     const contents = e.target.result;
+//     const gridData = JSON.parse(contents);
+
+//     gridData.forEach((cellData) => {
+//       const { number, color } = cellData;
+//       const cell = document.querySelector(`.grid-cell[data-number="${number}"]`);
+//       cell.style.backgroundColor = color;
+//     });
+//   };
+//   reader.readAsText(file);
+// }
+let layers = [];
+
+// Function to read and apply the grid data from a JSON file with layer option
+function uploadJSONGridWithLayer() {
+  const fileInput = document.getElementById('json-file-input');
+  const file = fileInput.files[0];
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const contents = e.target.result;
+    const gridData = JSON.parse(contents);
+
+    const layerOption = document.getElementById('layer-option').value;
+    const newLayer = [];
+
+    if (layerOption === 'over') {
+      // Place the new layer above the previous layers
+      newLayer.push(...gridData);
+      layers.unshift(newLayer);
+    } else if (layerOption === 'under') {
+      // Place the new layer below the previous layers
+      newLayer.push(...gridData);
+      layers.push(newLayer);
+    }
+
+    // Apply the grid data from all layers to the grid
+    updateGridFromLayers();
+  };
+  reader.readAsText(file);
+}
+
+// Function to update the grid from all layers
+function updateGridFromLayers() {
+  clearGrid(); // Clear the grid
+
+  // Iterate through all layers and apply the colors to the grid
+  layers.forEach((layer) => {
+    layer.forEach((cellData) => {
+      const { number, color } = cellData;
+      const cell = document.querySelector(`.grid-cell[data-number="${number}"]`);
+      
+      // Apply the color based on layer order
+      if (cell.style.backgroundColor === '' || cell.style.backgroundColor === 'transparent') {
+        cell.style.backgroundColor = color;
+      }
+    });
+  });
+}
+
+// Function to clear the grid
+function clearGrid() {
+  const cells = document.getElementsByClassName('grid-cell');
+  Array.from(cells).forEach((cell) => {
+    cell.style.backgroundColor = '';
+  });
 }

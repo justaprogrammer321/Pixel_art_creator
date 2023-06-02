@@ -13,6 +13,15 @@
         <button onclick="updateColor()">Apply Color</button>
         <button onclick="toggleEraser()">Eraser</button>
         <button onclick="downloadGrid()">Download</button>
+        <button onclick="downloadGridJSON()">Download JSON</button>
+        <!-- <input type="file" id="json-file-input" accept=".json">
+        <button onclick="uploadJSONGrid()">Upload JSON Grid</button> -->
+        <select id="layer-option">
+            <option value="over">Over</option>
+            <option value="under">Under</option>
+        </select>
+        <input type="file" id="json-file-input" accept=".json">
+        <button onclick="uploadJSONGridWithLayer()">Upload JSON Grid</button>
       </div>
       <div id="grid-container"></div>
     <script src="script.js"></script>

@@ -5,12 +5,12 @@
     grid-template-columns: repeat(64, 10px);
     grid-template-rows: repeat(64, 10px);
     gap: 1px; /* Add a 1px gap between cells if desired */
-    border: 1px solid #000; /* Add a border to the grid if desired */
   }
   
   .grid-cell {
     background-color: #e0e0e0;
     cursor: pointer; /* Add cursor style to indicate interactivity */
+    font-size: 0px;
   }
   
   
